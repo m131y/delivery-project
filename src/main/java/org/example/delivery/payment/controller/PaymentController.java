@@ -1,5 +1,6 @@
 package org.example.delivery.payment.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.delivery.payment.dto.PaymentRequest;
 import org.example.delivery.payment.service.PaymentService;
@@ -14,7 +15,7 @@ public class PaymentController {
 
     //결제 요청
     @PostMapping("/{orderId}")
-    public void processPayment(@AuthenticationPrincipal String username, @PathVariable Long orderId, @RequestBody PaymentRequest paymentRequest) {
+    public void processPayment(@AuthenticationPrincipal String username, @PathVariable Long orderId, @RequestBody @Valid PaymentRequest paymentRequest) {
         paymentService.processPayment(username, orderId, paymentRequest);
     }
 

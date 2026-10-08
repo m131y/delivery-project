@@ -23,7 +23,7 @@ import java.util.List;
 public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     @Column(nullable = false)
     private Long count;
     @Column(name = "total_price", nullable = false)

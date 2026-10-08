@@ -7,7 +7,7 @@ import org.example.delivery.order.entity.OrderStatus;
 @Data
 @Builder
 public class OrderResponse {
-    private Long Id;
+    private Long id;
     private Long count;
     private Long totalPrice;
     private String address;

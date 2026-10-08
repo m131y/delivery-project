@@ -1,8 +1,8 @@
 package org.example.delivery.order.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.delivery.exception.ForbiddenException;
-import org.example.delivery.exception.MenuNotFoundException;
+import org.example.delivery.global.error.ErrorCode;
+import org.example.delivery.global.error.exception.BusinessException;
 import org.example.delivery.menu.entity.Menu;
 import org.example.delivery.menu.repository.MenuRepository;
 import org.example.delivery.order.dto.OrderRequest;
@@ -29,17 +29,17 @@ public class OrderService {
 
     public OrderResponse createOrder(String username, Long menuId, OrderRequest orderRequest) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(()->new IllegalArgumentException("로그인 정보를 찾을 수 없습니다."));
+                .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         if (!(user.getRole() == Role.CUSTOMER)) {
-            throw new ForbiddenException("고객님만 메뉴를 주문할 수 있습니다.");
+            throw new BusinessException(ErrorCode.CUSTOMER_ONLY, "고객님만 메뉴를 주문할 수 있습니다.");
         }
 
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(()-> new MenuNotFoundException("메뉴를 찾을 수 없습니다."));
+                .orElseThrow(()-> new BusinessException(ErrorCode.MENU_NOT_FOUND));
 
         if (menu.isDeleted()) {
-            throw new ForbiddenException("삭제된 메뉴 입니다.");
+            throw new BusinessException(ErrorCode.MENU_DELETED);
         }
 
         Order order = Order.builder()
@@ -54,7 +54,7 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         return OrderResponse.builder()
-                .Id(savedOrder.getId())
+                .id(savedOrder.getId())
                 .count(savedOrder.getCount())
                 .totalPrice(savedOrder.getTotalPrice())
                 .address(savedOrder.getAddress())
@@ -66,7 +66,7 @@ public class OrderService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("로그인 정보를 찾을 수 없습니다.")
+                        new BusinessException(ErrorCode.USER_NOT_FOUND)
                 );
 
         List<Order> orderList = new ArrayList<>();
@@ -82,7 +82,7 @@ public class OrderService {
 
         return orderList.stream()
                 .map(order -> OrderResponse.builder()
-                        .Id(order.getId())
+                        .id(order.getId())
                         .count(order.getCount())
                         .totalPrice(order.getTotalPrice())
                         .address(order.getAddress())
@@ -93,21 +93,21 @@ public class OrderService {
 
     public void cancelOrder(String username, Long orderId) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(()->new IllegalArgumentException("로그인 정보를 찾을 수 없습니다."));
+                .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         if (!(user.getRole() == Role.CUSTOMER)) {
-            throw new ForbiddenException("고객님만 메뉴를 취소할 수 있습니다.");
+            throw new BusinessException(ErrorCode.CUSTOMER_ONLY, "고객님만 메뉴를 취소할 수 있습니다.");
         }
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(()->new IllegalArgumentException("주문 정보를 찾을 수 없습니다."));
+                .orElseThrow(()->new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         if (user != order.getUser()) {
-            throw new ForbiddenException("본인의 주문만 취소할 수 있습니다.");
+            throw new BusinessException(ErrorCode.ORDER_NOT_OWNER, "본인의 주문만 취소할 수 있습니다.");
         }
 
         if (order.getOrderStatus() != OrderStatus.ORDERED) {
-            throw new ForbiddenException("주문 요청 상태일 때만 취소가 가능합니다.");
+            throw new BusinessException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
 
         order.setOrderStatus(OrderStatus.CANCELED);
@@ -118,25 +118,25 @@ public class OrderService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("로그인 정보를 찾을 수 없습니다.")
+                        new BusinessException(ErrorCode.USER_NOT_FOUND)
                 );
 
         if (user.getRole() == Role.CUSTOMER) {
-            throw new ForbiddenException("사장님만 상태를 변경할 수 있습니다.");
+            throw new BusinessException(ErrorCode.OWNER_ONLY, "사장님만 상태를 변경할 수 있습니다.");
         }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("주문 정보를 찾을 수 없습니다.")
+                        new BusinessException(ErrorCode.ORDER_NOT_FOUND)
                 );
 
         if (!user.getId().equals(order.getMenu().getUser().getId())) {
-            throw new ForbiddenException("본인의 주문만 상태 변경할 수 있습니다.");
+            throw new BusinessException(ErrorCode.ORDER_NOT_OWNER, "본인의 주문만 상태 변경할 수 있습니다.");
         }
 
         if (!(order.getOrderStatus() == OrderStatus.PAID
                 || order.getOrderStatus() == OrderStatus.ACCEPTED)) {
-            throw new ForbiddenException("결제 완료, 주문 수락 상태일 때만 변경이 가능합니다.");
+            throw new BusinessException(ErrorCode.ORDER_STATUS_CHANGE_NOT_ALLOWED);
         }
 
         if (order.getOrderStatus() == OrderStatus.PAID) {
