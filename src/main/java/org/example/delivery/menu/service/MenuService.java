@@ -38,26 +38,18 @@ public class MenuService {
 
         Menu savedMenu = menuRepository.save(menu);
 
-        return MenuResponse.builder()
-                .id(savedMenu.getId())
-                .menuName(savedMenu.getMenuName())
-                .price(savedMenu.getPrice())
-                .isDeleted(savedMenu.isDeleted())
-                .build();
+        return MenuResponse.from(savedMenu);
     }
 
+    @Transactional(readOnly = true)
     public List<MenuResponse> getMenus() {
         List<Menu> menuList = menuRepository.findAllByIsDeletedFalse();
-        return menuList.stream().map( menu ->  {
-            return MenuResponse.builder()
-                    .id(menu.getId())
-                    .menuName(menu.getMenuName())
-                    .price(menu.getPrice())
-                    .isDeleted(menu.isDeleted())
-                    .build();
-        }).toList();
+        return menuList.stream()
+                .map(MenuResponse::from)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
     public MenuResponse getMenu(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(()-> new BusinessException(ErrorCode.MENU_NOT_FOUND));
@@ -65,12 +57,7 @@ public class MenuService {
         if (menu.isDeleted()) {
             throw new BusinessException(ErrorCode.MENU_DELETED);
         }
-        return MenuResponse.builder()
-                .id(menu.getId())
-                .menuName(menu.getMenuName())
-                .price(menu.getPrice())
-                .isDeleted(menu.isDeleted())
-                .build();
+        return MenuResponse.from(menu);
     }
 
     public MenuResponse updateMenu(Long menuId, String username, MenuCreateRequest request) {
@@ -81,7 +68,7 @@ public class MenuService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        if (menu.getUser() != user) {
+        if (!menu.getUser().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.MENU_NOT_OWNER, "본인의 메뉴만 수정할 수 있습니다.");
         }
 
@@ -92,14 +79,7 @@ public class MenuService {
         menu.setMenuName(request.getMenuName());
         menu.setPrice(request.getPrice());
 
-        Menu savedMenu = menuRepository.save(menu);
-
-        return MenuResponse.builder()
-                .id(savedMenu.getId())
-                .menuName(savedMenu.getMenuName())
-                .price(savedMenu.getPrice())
-                .isDeleted(savedMenu.isDeleted())
-                .build();
+        return MenuResponse.from(menu);
     }
 
     public void deleteMenu(Long menuId, String username) {
@@ -109,7 +89,7 @@ public class MenuService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        if (menu.getUser() != user) {
+        if (!menu.getUser().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.MENU_NOT_OWNER, "본인의 메뉴만 삭제할 수 있습니다.");
         }
 

@@ -29,14 +29,14 @@ public class OrderController {
     }
 
     // 주문 취소 (customer)
-    @PutMapping("/{orderId}")
+    @PutMapping("/{orderId}/cancel")
     public void cancelOrder(@AuthenticationPrincipal String username, @PathVariable Long orderId) {
         orderService.cancelOrder(username, orderId);
     }
     // 주문 상태 변경 (owner)
-    @PutMapping("/owner/{orderId}")
-    public void changeOrder(@AuthenticationPrincipal String username, @PathVariable Long orderId) {
-        orderService.changeOrder(username, orderId);
+    @PutMapping("/owner/{orderId}/status")
+    public void changeOrderStatus(@AuthenticationPrincipal String username, @PathVariable Long orderId) {
+        orderService.changeOrderStatus(username, orderId);
     }
 
 }
