@@ -5,6 +5,7 @@ import org.example.delivery.global.security.JwtAuthenticationFilter;
 import org.example.delivery.global.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -37,6 +38,11 @@ public class SecurityConfig {
                                         "/api/users/signup",
                                         "/api/users/login",
                                         "/error"
+                                ).permitAll()
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/menus",
+                                        "/api/menus/{menuId}"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )

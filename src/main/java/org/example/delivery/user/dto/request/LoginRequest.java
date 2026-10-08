@@ -6,11 +6,9 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-    @NotBlank(message = "Username is required")
-    @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters")
+    @NotBlank(message = "로그인 ID는 필수 입력입니다.")
     private String username;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @NotBlank(message = "패스워드는 필수 입력입니다.")
     private String password;
 }
