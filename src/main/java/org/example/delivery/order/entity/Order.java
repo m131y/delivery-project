@@ -1,4 +1,4 @@
-package org.example.delivery.menu.entity;
+package org.example.delivery.order.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -7,36 +7,38 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.delivery.global.entity.BaseEntity;
-import org.example.delivery.order.entity.Order;
+import org.example.delivery.menu.entity.Menu;
 import org.example.delivery.user.entity.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@Table(name = "menus")
+@Table(name = "orders")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Menu extends BaseEntity {
+public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long Id;
     @Column(nullable = false)
-    private Long price;
-    @Column(name = "menu_name", nullable = false)
-    private String menuName;
-    @Column(name = "is_deleted")
+    private Long count;
+    @Column(name = "total_price", nullable = false)
+    private Long totalPrice;
+    @Column(nullable = false)
+    private String address;
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private boolean isDeleted = false;
+    private OrderStatus orderStatus=OrderStatus.ORDERED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Order> orderList = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_id", nullable = false)
+    @JsonBackReference
+    private Menu menu;
+
+
 }
