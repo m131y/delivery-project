@@ -1,4 +1,4 @@
-package org.example.delivery.order.entity;
+package org.example.delivery.payment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -7,32 +7,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.delivery.global.entity.BaseEntity;
-import org.example.delivery.menu.entity.Menu;
-import org.example.delivery.payment.entity.Payment;
+import org.example.delivery.order.entity.Order;
 import org.example.delivery.user.entity.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@Table(name = "orders")
+@Table(name = "payments")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order extends BaseEntity {
+public class Payment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
     @Column(nullable = false)
-    private Long count;
-    @Column(name = "total_price", nullable = false)
-    private Long totalPrice;
-    @Column(nullable = false)
-    private String address;
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private OrderStatus orderStatus=OrderStatus.ORDERED;
+    private PaymentMethod paymentMethod;
+    @Column(nullable = false)
+    private Long paymentAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -40,11 +32,7 @@ public class Order extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     @JsonBackReference
-    private Menu menu;
-
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Payment> paymentList = new ArrayList<>();
+    private Order order;
 }

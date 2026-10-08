@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.example.delivery.global.entity.BaseEntity;
 import org.example.delivery.menu.entity.Menu;
 import org.example.delivery.order.entity.Order;
+import org.example.delivery.payment.entity.Payment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,4 +43,8 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Order> orderList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Payment> paymentList = new ArrayList<>();
 }
