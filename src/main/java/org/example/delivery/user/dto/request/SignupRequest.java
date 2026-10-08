@@ -8,17 +8,17 @@ import org.example.delivery.user.entity.Role;
 @Data
 public class SignupRequest {
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters")
+    @NotBlank(message = "로그인 ID는 필수 입력입니다.")
+    @Size(min = 4, max = 20, message = "로그인 아이디는 4자 이상 20자 이하여야 합니다.")
     private String username;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @NotBlank(message = "패스워드는 필수 입력입니다.")
+    @Size(min = 8, message = "패스워드는 최소 8자 이상이어야 합니다.")
     private String password;
 
-    @NotBlank(message = "Nickname is required")
+    @NotBlank(message = "닉네임은 필수 입력입니다.")
     private String nickname;
 
-    @NotBlank(message = "Role is required")
+    @NotBlank(message = "계정유형은 필수 선택입니다.")
     private Role role;
 }
