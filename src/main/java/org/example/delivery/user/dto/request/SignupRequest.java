@@ -1,6 +1,7 @@
 package org.example.delivery.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.example.delivery.user.entity.Role;
@@ -19,6 +20,6 @@ public class SignupRequest {
     @NotBlank(message = "닉네임은 필수 입력입니다.")
     private String nickname;
 
-    @NotBlank(message = "계정유형은 필수 선택입니다.")
+    @NotNull(message = "계정유형은 필수 선택입니다.")
     private Role role;
 }

@@ -1,5 +1,6 @@
 package org.example.delivery.order.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.delivery.order.dto.OrderRequest;
 import org.example.delivery.order.dto.OrderResponse;
@@ -18,7 +19,7 @@ public class OrderController {
 
 
     @PostMapping("/{menuId}")
-    public ResponseEntity<OrderResponse> createOrder(@AuthenticationPrincipal String username, @PathVariable Long menuId, @RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<OrderResponse> createOrder(@AuthenticationPrincipal String username, @PathVariable Long menuId, @RequestBody @Valid OrderRequest orderRequest) {
         return ResponseEntity.ok(orderService.createOrder(username, menuId, orderRequest));
     }
 
