@@ -53,15 +53,10 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return OrderResponse.builder()
-                .id(savedOrder.getId())
-                .count(savedOrder.getCount())
-                .totalPrice(savedOrder.getTotalPrice())
-                .address(savedOrder.getAddress())
-                .orderStatus(savedOrder.getOrderStatus())
-                .build();
+        return OrderResponse.from(savedOrder);
     }
 
+    @Transactional(readOnly = true)
     public List<OrderResponse> getOrders(String username) {
 
         User user = userRepository.findByUsername(username)
@@ -81,13 +76,7 @@ public class OrderService {
         }
 
         return orderList.stream()
-                .map(order -> OrderResponse.builder()
-                        .id(order.getId())
-                        .count(order.getCount())
-                        .totalPrice(order.getTotalPrice())
-                        .address(order.getAddress())
-                        .orderStatus(order.getOrderStatus())
-                        .build())
+                .map(OrderResponse::from)
                 .toList();
     }
 
@@ -102,7 +91,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()->new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (user != order.getUser()) {
+        if (!order.getUser().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.ORDER_NOT_OWNER, "본인의 주문만 취소할 수 있습니다.");
         }
 
@@ -111,10 +100,9 @@ public class OrderService {
         }
 
         order.setOrderStatus(OrderStatus.CANCELED);
-        orderRepository.save(order);
     }
 
-    public void changeOrder(String username, Long orderId) {
+    public void changeOrderStatus(String username, Long orderId) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
@@ -130,7 +118,7 @@ public class OrderService {
                         new BusinessException(ErrorCode.ORDER_NOT_FOUND)
                 );
 
-        if (!user.getId().equals(order.getMenu().getUser().getId())) {
+        if (!order.getMenu().getUser().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.ORDER_NOT_OWNER, "본인의 주문만 상태 변경할 수 있습니다.");
         }
 
@@ -144,7 +132,5 @@ public class OrderService {
         } else if (order.getOrderStatus() == OrderStatus.ACCEPTED) {
             order.setOrderStatus(OrderStatus.COMPLETED);
         }
-
-        orderRepository.save(order);
     }
 }

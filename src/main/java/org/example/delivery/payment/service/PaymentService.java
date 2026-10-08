@@ -35,7 +35,7 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()->new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (user != order.getUser()) {
+        if (!order.getUser().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.ORDER_NOT_OWNER, "본인의 주문만 결제할 수 있습니다.");
         }
 

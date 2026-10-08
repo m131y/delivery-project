@@ -41,14 +41,10 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        return UserResponse.builder()
-                .id(savedUser.getId())
-                .nickname(savedUser.getNickname())
-                .role(savedUser.getRole())
-                .username(savedUser.getUsername())
-                .build();
+        return UserResponse.from(savedUser);
     }
 
+    @Transactional(readOnly = true)
     public UserResponse login(LoginRequest loginRequest, HttpServletResponse res) {
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_LOGIN));
@@ -61,11 +57,6 @@ public class UserService {
         String token = jwtUtil.createToken(user.getUsername(), user.getRole());
         res.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
-        return UserResponse.builder()
-                .id(user.getId())
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .username(user.getUsername())
-                .build();
+        return UserResponse.from(user);
     }
 }
